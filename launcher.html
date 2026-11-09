@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minecraft Launcher</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Press+Start+2P&display=swap">
+<style>
+:root{--side:#1b1b1b;--main:#212121;--bar:#1b1b1b;--line:#2e2e2e;--mute:#a9a9a9;--green:#1d9a48;--green-hi:#26b058;--ul:#2aa14e}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+html,body{height:100%;overflow:hidden;background:#000}
+body{font-family:"Noto Sans","Segoe UI",system-ui,sans-serif;font-size:14px;color:#fff}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+.px{image-rendering:pixelated}
+#win{display:grid;grid-template-rows:32px 1fr;height:100%}
+#tb{display:flex;align-items:center;gap:8px;background:#fff;color:#000;font-size:12px;padding-left:10px}
+#tb .gi{width:16px;height:16px}
+#tb .sp{flex:1}
+#tb button{width:46px;height:32px;color:#000;font-size:14px}
+#tb button:hover{background:#e6e6e6}
+#tb #bx:hover{background:#e81123;color:#fff}
+#body{display:grid;grid-template-columns:180px 1fr;min-height:0}
+#side{background:var(--side);display:flex;flex-direction:column;min-height:0;overflow:auto}
+.sp{flex:1}
+.acct{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);margin-bottom:10px;text-align:left}
+.acct b{display:block;font-weight:400;font-size:14px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct small{display:flex;align-items:center;gap:6px;color:var(--mute);font-size:12px;margin-top:3px}
+.acct small i{width:8px;height:8px;background:#1fa14a;display:block}
+.si{position:relative;display:flex;align-items:center;gap:14px;width:100%;padding:10px 16px;text-align:left;min-height:56px}
+.si:hover{background:#262626}
+.si.on::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;background:#fff}
+.si svg{width:30px;height:30px;flex:none;fill:#cfcfcf}
+.si .gi{width:30px;height:30px;flex:none}
+.si .t{min-width:0}
+.si .t small{display:block;font-size:11px;letter-spacing:.3px;color:#cfcfcf}
+.si .t b{display:block;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si>span:not(.gi):not(.t){font-size:16px}
+#content{display:grid;grid-template-rows:auto 1fr auto;background:var(--main);min-width:0;min-height:0}
+#head{padding:26px 20px 0}
+#ht{font-size:13px;font-weight:700;letter-spacing:.2px;margin-bottom:6px}
+#tabs{display:flex;gap:30px}
+#tabs button{padding:4px 0 10px;font-size:16px;color:var(--mute);border-bottom:3px solid transparent}
+#tabs button:hover{color:#fff}
+#tabs button.on{color:#fff;font-weight:700;border-bottom-color:var(--ul)}
+#views{position:relative;min-height:0;overflow:auto}
+.view{height:100%}
+.pad{padding:22px 20px}
+#v-play{position:relative;overflow:hidden;background:#15171d}
+#art,#heroimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;background-size:cover;background-position:center}
+#v-play::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 55% 62%,rgba(255,140,40,.3),transparent 42%),radial-gradient(ellipse at center,transparent 38%,rgba(0,0,0,.72))}
+.logo{position:absolute;z-index:1;top:7%;left:0;right:0;text-align:center;font-family:"Press Start 2P",monospace;pointer-events:none}
+.logo b{display:block;font-weight:400;font-size:clamp(24px,5vw,56px);color:#9b9b9b;-webkit-text-stroke:9px #121212;paint-order:stroke fill;text-shadow:0 6px 0 #121212;letter-spacing:2px}
+.logo i{display:block;font-style:normal;margin-top:12px;font-size:clamp(11px,2vw,22px);color:#e4e4e4;-webkit-text-stroke:6px #121212;paint-order:stroke fill;overflow-wrap:anywhere;padding:0 20px}
+h2{font-size:18px;margin-bottom:14px}
+.card{background:#2b2b2b;border:1px solid #383838;padding:14px 16px;margin-bottom:12px;max-width:640px}
+.card b{display:block;margin-bottom:4px}
+.card p,.mute{color:var(--mute);line-height:1.45}
+code{background:#111;padding:1px 6px}
+.tools{display:flex;gap:10px;margin-bottom:14px;max-width:760px}
+.tools input,#user{flex:1;background:#141414;border:1px solid #3a3a3a;padding:8px 10px;outline:0}
+.tools input:focus,#user:focus{border-color:#7d7d7d}
+.btn{background:#3a3a3a;padding:8px 16px;font-weight:700}
+.btn:hover{background:#4a4a4a}
+.row{display:flex;align-items:center;gap:14px;padding:10px 12px;max-width:760px;border-bottom:1px solid var(--line)}
+.row:hover{background:#292929}
+.row .gi{width:36px;height:36px;flex:none}
+.row .t{flex:1;min-width:0}
+.row b{display:block}
+.row small,.vr small{display:block;color:var(--mute);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .bad,.vr .bad{color:#e06060}
+.row .btn{background:#2f7d3e;visibility:hidden}
+.row:hover .btn,.row .btn:focus-visible{visibility:visible}
+.row .btn:hover{background:#3a9a4d}
+.field{display:block;margin:0 0 16px;max-width:360px}
+.field span{display:block;color:var(--mute);margin-bottom:6px}
+.chk{display:flex;gap:10px;align-items:center}
+#face{width:128px;height:128px;border:2px solid #000;display:block;margin-bottom:12px}
+#bar{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:58px;padding:0 20px;background:var(--bar);border-top:1px solid #000}
+#ver{position:relative}
+#vb{display:flex;align-items:center;gap:12px;text-align:left;max-width:260px;padding:4px 6px 4px 0}
+#vb .gi{width:32px;height:32px;flex:none}
+#vb .vr{min-width:0}
+#vb .vr b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#menu{position:absolute;left:0;bottom:calc(100% + 8px);width:290px;max-height:260px;overflow:auto;background:#2a2a2a;border:1px solid #444;z-index:30}
+#menu button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;text-align:left}
+#menu button:hover{background:#383838}
+#menu .gi{width:24px;height:24px;flex:none}
+#menu .vr{min-width:0}
+#play{position:relative;justify-self:center;width:246px;height:52px;margin-top:-8px;overflow:hidden;background:var(--green);color:#fff;font-family:"Press Start 2P",monospace;font-size:18px;letter-spacing:1px;text-shadow:2px 2px 0 #0b4a23;border:3px solid #0b3a1d;box-shadow:inset 0 3px 0 #4dd07d,inset 0 -5px 0 #137637,inset 3px 0 0 #2fb35f,inset -3px 0 0 #137637;clip-path:polygon(0 4px,4px 4px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 4px),0 calc(100% - 4px))}
+#play:hover:not(:disabled){background:var(--green-hi)}
+#play:disabled{cursor:default}
+#play:not(.busy):disabled{background:#4a4a4a;border-color:#222;box-shadow:inset 0 3px 0 #666,inset 0 -5px 0 #333;color:#999;text-shadow:none}
+#fill{position:absolute;inset:0 auto 0 0;width:0;background:#4dd07d55;transition:width .25s}
+#playtxt{position:relative}
+#plname{justify-self:end;font-size:14px}
+#game{position:fixed;inset:0;z-index:50;display:none;background:#000}
+#game.on{display:block}
+#game iframe{width:100%;height:100%;border:0;background:#fff}
+#exit{position:fixed;top:0;left:0;z-index:60;padding:3px 14px 5px;background:#000c;border-bottom-right-radius:6px;font-size:13px;opacity:.4}
+#exit:hover,#exit:focus-visible{opacity:1}
+@media (max-width:700px){
+ #body{grid-template-columns:60px 1fr}
+ .acct>span,.si .t,.si>span:not(.gi){display:none}
+ .acct{justify-content:center;padding:14px 0}
+ .si{justify-content:center;padding:10px 0}
+ #tabs{gap:16px}#tabs button{font-size:14px}
+ #plname{display:none}#bar{grid-template-columns:1fr auto}
+ #play{width:170px}
+}
+@media (prefers-reduced-motion:reduce){#fill{transition:none}}
+</style>
+</head>
+<body>
+<div id="win">
+ <div id="tb"><span class="gi px"></span><span>Minecraft Launcher</span><span class="sp"></span>
+  <button id="bmin" aria-label="Minimize">&#8211;</button><button id="bmax" aria-label="Toggle fullscreen">&#9633;</button><button id="bx" aria-label="Close">&#10005;</button></div>
+ <div id="body">
+  <nav id="side">
+   <button class="acct" id="acct"><span><b id="who"></b><small><i></i>Connected</small></span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#ccc" stroke-width="1.6"><path d="M2 5l5 5 5-5"/></svg></button>
+   <button class="si" data-r="news"><svg viewBox="0 0 30 30"><path d="M6 5h15v20H8a2 2 0 0 1-2-2zM23 9h3v14a2 2 0 0 1-3 2zM9 9v4h9V9zm0 6v2h9v-2zm0 4v2h9v-2z" fill-rule="evenodd"/></svg><span>News</span></button>
+   <button class="si on" data-r="game"><span class="gi px" id="sgi"></span><span class="t"><small>MINECRAFT:</small><b id="sname"></b></span></button>
+   <span class="sp"></span>
+   <button class="si" data-r="settings"><svg viewBox="0 0 30 30"><path d="M7 4h2v7H7zM7 15h2v11H7zM14 4h2v13h-2zM14 21h2v5h-2zM21 4h2v3h-2zM21 11h2v15h-2zM4 11h8v4H4zM11 17h8v4h-8zM18 7h8v4h-8z"/></svg><span>Settings</span></button>
+  </nav>
+  <section id="content">
+   <div id="head"><div id="ht"></div>
+    <div id="tabs"><button data-t="play" class="on">Play</button><button data-t="inst">Installations</button><button data-t="skins">Skins</button><button data-t="notes">Patch notes</button></div></div>
+   <div id="views">
+    <div class="view" id="v-play"><canvas id="art" class="px"></canvas><div id="heroimg" hidden></div>
+     <div class="logo"><b>MINECRAFT</b><i id="logo2"></i></div></div>
+    <div class="view pad" id="v-inst" hidden>
+     <div class="tools"><input id="q" placeholder="Search installations" aria-label="Search installations"><button class="btn" id="add">New installation</button></div>
+     <div id="rows"></div></div>
+    <div class="view pad" id="v-skins" hidden><h2>Skins</h2><canvas id="face" width="8" height="8" class="px"></canvas><p class="mute">This face is generated from your player name. Change the name in Settings.</p></div>
+    <div class="view pad" id="v-notes" hidden><h2>Patch notes</h2>
+     <div class="card"><b>Launcher 1.1</b><p>Rebuilt to follow the Java Edition launcher layout. Installations lists every game and has a search box.</p></div>
+     <div class="card"><b>Launcher 1.0</b><p>First version. Games open inside the launcher; Esc brings you back.</p></div></div>
+    <div class="view pad" id="v-news" hidden><h2>News</h2>
+     <div class="card"><b>Adding games</b><p>Put a game folder or .html file next to this launcher, then add its name to <code>GAMES</code> at the top of the script. You can also use New installation under Installations.</p></div>
+     <div class="card"><b>Returning to the launcher</b><p>Press Esc or use the small tab at the top-left of a running game.</p></div></div>
+    <div class="view pad" id="v-settings" hidden><h2>Settings</h2>
+     <label class="field"><span>Player name</span><input id="user" maxlength="16" spellcheck="false" autocomplete="off"></label>
+     <label class="chk"><input type="checkbox" id="newtab"> Open games in a new tab instead</label></div>
+   </div>
+   <div id="bar">
+    <div id="ver"><button id="vb"><span class="gi px" id="vgi"></span><span class="vr"><b id="vname"></b><small id="vpath"></small></span>
+     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#ccc" stroke-width="1.6"><path d="M2 5l5 5 5-5"/></svg></button><div id="menu" hidden></div></div>
+    <button id="play" disabled><span id="fill"></span><span id="playtxt">PLAY</span></button>
+    <div id="plname"></div>
+   </div>
+  </section>
+ </div>
+</div>
+<div id="game"><button id="exit">&lt; Launcher</button><iframe id="frame" title="Game" allow="fullscreen; autoplay; gamepad; clipboard-write; pointer-lock" allowfullscreen></iframe></div>
+
+<script>
+/* ===== ADD YOUR GAMES HERE =====
+   A folder name opens folder/index.html. A name ending in .html opens that file.
+   Paths are relative to this launcher file. */
+const GAMES = ["geodash", "tubeslides", "darkroom"];
+/* Optional: path to a hero image (e.g. "hero.jpg") to replace the generated cave scene */
+const HERO_IMAGE = "";
+/* ================================ */
+
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const store = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
+
+/* textures */
+function rng(seed){ return () => { seed = Math.imul(seed ^ seed >>> 15, seed | 1); seed ^= seed + Math.imul(seed ^ seed >>> 7, seed | 61); return ((seed ^ seed >>> 14) >>> 0) / 4294967296; }; }
+const DIRT = ["#866043","#79553a","#6b4a32","#8f6a4b","#5d4029"], GRASS = ["#5fa83a","#55993a","#4a8a30","#6bb544"];
+const pick = (a, r) => a[Math.floor(r() * a.length)];
+const blockURL = (() => { const c = document.createElement("canvas"); c.width = c.height = 16; const x = c.getContext("2d"), r = rng(3);
+  for (let i = 0; i < 16; i++) for (let j = 0; j < 16; j++){ x.fillStyle = j < 4 || (j < 6 && r() > .55) ? pick(GRASS, r) : pick(DIRT, r); x.fillRect(i, j, 1, 1); }
+  return "url(" + c.toDataURL() + ")"; })();
+$$(".gi").forEach(e => e.style.backgroundImage = blockURL);
+$$(".gi").forEach(e => e.style.backgroundSize = "cover");
+
+/* hero art: stone cave, water, grass, two blocky explorers and a creeper head */
+function drawArt(){
+  const W = 320, H = 180, c = $("#art"), x = c.getContext("2d"), r = rng(5); c.width = W; c.height = H;
+  for (let by = 0; by < H; by += 20) for (let bx = 0; bx < W; bx += 20){ const b = .55 + r() * .45;
+    for (let j = 0; j < 20; j++) for (let i = 0; i < 20; i++){ const e = i < 1 || j < 1 ? .7 : 1, v = Math.floor(78 * b * e * (.88 + r() * .24)); x.fillStyle = `rgb(${v},${v + 6},${v + 16})`; x.fillRect(bx + i, by + j, 1, 1); } }
+  for (let j = 70; j < H; j++) for (let i = 0; i < 62 - (j < 80 ? 10 : 0); i++){ x.fillStyle = `rgb(${30 + r() * 25|0},${90 + r() * 50|0},${215 + r() * 35|0})`; x.fillRect(i, j, 1, 1); }
+  const block = (a, b, w, h) => { for (let j = 0; j < h; j++) for (let i = 0; i < w; i++){ x.fillStyle = j < 5 || (j < 7 && r() > .5) ? pick(GRASS, r) : pick(DIRT, r); x.fillRect(a + i, b + j, w > 0 ? 1 : 0, 1); } };
+  block(0, 150, 70, 30); block(250, 138, 70, 42); block(105, 152, 110, 28);
+  const fig = (X, Y, skin, hair, shirt, pants) => { const f = (a, b, w, h, col) => { x.fillStyle = col; x.fillRect(X + a, Y + b, w, h); };
+    f(0, 0, 8, 8, skin); f(0, 0, 8, 3, hair); f(1, 4, 2, 1, "#fff"); f(2, 4, 1, 1, "#3a3ab0"); f(5, 4, 2, 1, "#fff"); f(5, 4, 1, 1, "#3a3ab0"); f(3, 6, 2, 1, "#8a5a3c");
+    f(0, 8, 8, 12, shirt); f(-4, 8, 4, 12, skin); f(8, 8, 4, 12, skin); f(-4, 8, 4, 4, shirt); f(8, 8, 4, 4, shirt); f(0, 20, 4, 12, pants); f(4, 20, 4, 12, pants); f(4, 20, 4, 12, "rgba(0,0,0,.18)"); };
+  fig(138, 120, "#c58c6b", "#3b2a1c", "#00a8a8", "#3d3d9e"); fig(166, 120, "#e0ac86", "#c97a2b", "#5a9d3a", "#6a4a2a");
+  for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++){ x.fillStyle = pick(["#4caf3a","#3f9a30","#5fc24a","#35862a"], r); x.fillRect(278 + i, 122 + j, 1, 1); }
+  x.fillStyle = "#101810"; [[2,4,4,4],[10,4,4,4],[6,8,4,4],[4,10,2,4],[10,10,2,4]].forEach(a => x.fillRect(278 + a[0], 122 + a[1], a[2], a[3]));
+}
+if (HERO_IMAGE){ $("#art").hidden = true; const h = $("#heroimg"); h.hidden = false; h.style.backgroundImage = "url(" + HERO_IMAGE + ")"; } else drawArt();
+
+/* games */
+function parse(entry){
+  const raw = entry.trim(), isFile = /\.html?$/i.test(raw);
+  const url = isFile ? raw : raw.replace(/\/+$/, "") + "/index.html";
+  const base = raw.split("/").filter(Boolean).pop().replace(/\.html?$/i, "");
+  return { raw, url, name: base.replace(/[-_]+/g, " ").replace(/\b\w/g, c => c.toUpperCase()) || raw, missing: false };
+}
+let extra = []; try { extra = JSON.parse(store.get("mcl-extra") || "[]"); } catch(e){}
+const games = [...GAMES, ...extra].map(parse);
+let sel = games.find(g => g.raw === store.get("mcl-last")) || games[0] || null, route = "game", tab = "play", playing = false;
+const sub = g => g.missing ? "File not found" : g.url;
+
+if (location.protocol.startsWith("http")) games.forEach(g => fetch(g.url, { method: "HEAD" }).then(r => { if (!r.ok){ g.missing = true; refresh(); } }).catch(() => {}));
+
+function refresh(){
+  const g = sel, n = g ? g.name : "No installations";
+  $("#sname").textContent = n; $("#vname").textContent = n; $("#logo2").textContent = g ? g.name.toUpperCase() : "";
+  $("#vpath").textContent = g ? sub(g) : "Add one in Installations"; $("#vpath").className = g && g.missing ? "bad" : "";
+  $("#play").disabled = !g || playing;
+  $("#who").textContent = $("#plname").textContent = $("#user").value;
+  show();
+}
+function show(){
+  const gm = route === "game";
+  $$(".view").forEach(v => v.hidden = true);
+  $("#v-" + (gm ? tab : route)).hidden = false;
+  $("#tabs").style.display = gm ? "flex" : "none"; $("#bar").style.display = gm ? "grid" : "none";
+  $("#ht").textContent = gm ? "MINECRAFT: " + (sel ? sel.name.toUpperCase() : "") : route.toUpperCase();
+  $$("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === tab));
+  $$(".si").forEach(b => b.classList.toggle("on", b.dataset.r === route));
+  if (gm && tab === "inst") renderRows();
+  if (gm && tab === "skins") drawFace();
+}
+function choose(g){ sel = g; store.set("mcl-last", g.raw); refresh(); }
+function renderRows(){
+  const q = $("#q").value.toLowerCase(), box = $("#rows"); box.textContent = "";
+  const list = games.filter(g => (g.name + g.raw).toLowerCase().includes(q));
+  if (!list.length){ const p = document.createElement("p"); p.className = "mute"; p.textContent = games.length ? "No installations match your search." : "No installations yet. Use New installation to add a folder or .html file."; box.appendChild(p); return; }
+  list.forEach(g => {
+    const row = document.createElement("div"); row.className = "row";
+    row.innerHTML = '<span class="gi px"></span><span class="t"><b></b><small></small></span><button class="btn">Play</button>';
+    row.querySelector(".gi").style.cssText = "background:" + blockURL + " center/cover";
+    row.querySelector("b").textContent = g.name; const s = row.querySelector("small"); s.textContent = sub(g); if (g.missing) s.className = "bad";
+    row.querySelector(".btn").onclick = () => { choose(g); tab = "play"; show(); launch(g); };
+    row.ondblclick = () => { choose(g); tab = "play"; show(); };
+    box.appendChild(row);
+  });
+}
+function renderMenu(){
+  const m = $("#menu"); m.textContent = "";
+  games.forEach(g => { const b = document.createElement("button"); b.innerHTML = '<span class="gi px"></span><span class="vr"><b></b><small></small></span>';
+    b.querySelector(".gi").style.cssText = "background:" + blockURL + " center/cover";
+    b.querySelector("b").textContent = g.name; b.querySelector("small").textContent = sub(g);
+    b.onclick = () => { choose(g); m.hidden = true; }; m.appendChild(b); });
+}
+$("#vb").onclick = e => { e.stopPropagation(); renderMenu(); $("#menu").hidden = !$("#menu").hidden || !games.length; };
+document.addEventListener("click", () => $("#menu").hidden = true);
+$("#add").onclick = () => { const v = (prompt("Folder name or .html file, relative to this launcher:") || "").trim(); if (!v) return;
+  extra.push(v); store.set("mcl-extra", JSON.stringify(extra)); const g = parse(v); games.push(g); if (!sel) sel = g; refresh(); };
+$("#q").oninput = renderRows;
+
+/* navigation */
+$$(".si").forEach(b => b.onclick = () => { route = b.dataset.r; refresh(); });
+$("#acct").onclick = () => { route = "settings"; refresh(); };
+$$("#tabs button").forEach(b => b.onclick = () => { tab = b.dataset.t; show(); });
+
+/* player */
+const user = $("#user"); user.value = store.get("mcl-user") || "Steve";
+$("#newtab").checked = store.get("mcl-newtab") === "1";
+$("#newtab").onchange = e => store.set("mcl-newtab", e.target.checked ? "1" : "0");
+user.oninput = () => { store.set("mcl-user", user.value); $("#who").textContent = $("#plname").textContent = user.value; };
+function drawFace(){
+  const c = $("#face").getContext("2d"), r = rng(Array.from(user.value || "Steve").reduce((h, ch) => Math.imul(h ^ ch.charCodeAt(0), 16777619), 2166136261) >>> 0);
+  c.fillStyle = ["#c58c6b","#e0ac86","#8d5b3d","#f1c7a5"][Math.floor(r() * 4)]; c.fillRect(0, 0, 8, 8);
+  c.fillStyle = ["#3b2a1c","#1c1c1c","#7a4a21","#c9a227"][Math.floor(r() * 4)]; c.fillRect(0, 0, 8, 2); c.fillRect(0, 2, 1, 2); c.fillRect(7, 2, 1, 2);
+  c.fillStyle = "#fff"; c.fillRect(1, 4, 2, 1); c.fillRect(5, 4, 2, 1); c.fillStyle = "#4b3fa0"; c.fillRect(2, 4, 1, 1); c.fillRect(5, 4, 1, 1);
+  c.fillStyle = "#7a4a30"; c.fillRect(3, 6, 2, 1);
+}
+
+/* window buttons */
+$("#bmax").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
+$("#bx").onclick = () => window.close();
+$("#bmin").onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); };
+
+/* launch */
+const frame = $("#frame"), playBtn = $("#play");
+function launch(g){
+  if (playing || !g) return;
+  if (store.get("mcl-newtab") === "1"){ window.open(g.url, "_blank"); return; }
+  playing = true; playBtn.disabled = true; playBtn.classList.add("busy"); $("#playtxt").textContent = "LAUNCHING";
+  let p = 6; $("#fill").style.width = p + "%";
+  const tick = setInterval(() => { p = Math.min(90, p + 6 + Math.random() * 10); $("#fill").style.width = p + "%"; }, 220);
+  const loaded = new Promise(res => { frame.onload = res; }), wait = new Promise(res => setTimeout(res, 1500));
+  frame.src = g.url;
+  Promise.all([loaded, wait]).then(() => { if (!playing) return; clearInterval(tick); $("#fill").style.width = "100%";
+    setTimeout(() => { if (!playing) return; $("#game").classList.add("on"); frame.focus(); }, 250); });
+}
+function exitGame(){
+  if (!playing) return;
+  playing = false; frame.onload = null; frame.src = "about:blank"; $("#game").classList.remove("on");
+  playBtn.classList.remove("busy"); $("#playtxt").textContent = "PLAY"; $("#fill").style.width = "0"; refresh();
+}
+playBtn.onclick = () => launch(sel);
+$("#exit").onclick = exitGame;
+addEventListener("keydown", e => { if (e.key === "Escape") exitGame(); });
+
+refresh();
+</script>
+</body>
+</html>
